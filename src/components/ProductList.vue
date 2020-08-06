@@ -15,19 +15,23 @@
                 :class='{ discontinued: product.discontinued, selected: product === selectedProduct }'
                 @click="onSelect(product)"
                 :title="JSON.stringify(product)">
-                <span class="name">{{ product.name }}</span>
-                <span class="description">{{ product.description }}</span>
-                <span class="price">{{ product.price }}</span>
+                <slot :product="product">
+                  {{ product.name }}
+                </slot>
             </li>
         </ul>
 
-        <button @click="prevPage" :disabled="pageNumber===1">
+        <div class="right">
+          <router-link to="/product/insert">Create new product</router-link>
+        </div>
+
+        <v-btn @click="prevPage" :disabled="pageNumber===1">
           &lt; Previous
-        </button>
+        </v-btn>
         Page {{ pageNumber }} / {{ pageCount }}
-        <button @click="nextPage" :disabled="pageNumber >= pageCount">
+        <v-btn @click="nextPage" :disabled="pageNumber >= pageCount">
           Next &gt;
-        </button>
+        </v-btn>
     </div>
 </template>
 
@@ -65,6 +69,7 @@
                 sortName: 'modifiedDate',
                 sortDir: 'desc',
                 pageNumber: 1,
+                componentName: "Product List"
             }
         },
         methods: {
@@ -78,6 +83,8 @@
           nextPage() {
             this.pageNumber++;
             this.selectedProduct = null;
+
+         //   throw new Error("Erreur dans next page!");
           },
           prevPage() {
             this.pageNumber--;

@@ -14,22 +14,30 @@
         <p>Price: {{product.price}}</p>
         <p>Fixed price? {{product.fixedPrice}}</p>
         <p>Discontinued? {{product.discontinued}}</p>
-        <p>Modified date: {{product.modifiedDate }}</p>              
+        <p>Modified date: {{product.modifiedDate | formatDate('MM/DD/YYYY hh:mm')  }}</p>              
+        <p>
+          <v-btn @click="deleteProduct">Delete</v-btn>
+        </p>
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import ProductService from '@/services/ProductService.js';
+import { mapState } from 'vuex'
 
     export default {
         data () {
             return {
-                error: null,
-                loading: false,
-                product: null
+                error: null,               
+                componentName: "Product Details"
             }
+        },
+        computed: {
+            product() {
+                return this.$store.state.product; 
+            },
+            ...mapState({loading:'isLoading'})
         },
         props: {
             id: {
@@ -38,16 +46,25 @@ import ProductService from '@/services/ProductService.js';
             }
         },
         created() {
-            this.loading = true;
-            ProductService.getProduct(this.id)
-                .then(response => {
-                    this.product = response.data
-                })
-                .catch(error => {
-                    this.error = error;
-                })
-                .finally(() => this.loading = false)
-        }
+          this.fetchProduct(this.id);
+        },
+        methods: {
+            fetchProduct(id) {
+                this.$store.dispatch('fetchProduct', id);
+            },
+            deleteProduct() {
+              if(window.confirm('Are you sure ??')) {
+                this.$store.dispatch('deleteProduct', this.product.id)
+                .then(
+                  () => this.$router.push({ name: "products" })
+                )
+                .catch(
+                  error => console.error('Could not delete product!' + error)
+                )
+
+              }
+            }
+        },
     }
 </script>
 
